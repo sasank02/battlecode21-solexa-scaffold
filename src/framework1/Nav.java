@@ -14,8 +14,10 @@ class SafetyPolicyAvoidAllUnits extends Bot implements NavSafetyPolicy {
 
     public boolean isSafeToMoveTo(MapLocation loc) {
         for (RobotInfo enemy: nearbyEnemies) {
+
             // TODO: If you move into some radius then don't move there.
         }
+        return true;
     }
 }
 

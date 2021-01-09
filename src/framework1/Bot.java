@@ -9,6 +9,17 @@ public class Bot {
 
     public static MapLocation here;
 
+    static final Direction[] directions = {
+            Direction.NORTH,
+            Direction.NORTHEAST,
+            Direction.EAST,
+            Direction.SOUTHEAST,
+            Direction.SOUTH,
+            Direction.SOUTHWEST,
+            Direction.WEST,
+            Direction.NORTHWEST,
+    };
+
     protected static void init(RobotController theRC) throws GameActionException {
         rc = theRC;
 

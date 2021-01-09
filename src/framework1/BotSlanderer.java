@@ -14,4 +14,11 @@ public class BotSlanderer extends Bot {
             Clock.yield();
         }
     }
+
+    public static void turn() throws GameActionException {
+        Direction dir = Direction.values()[(int)(8*Math.random())];
+        if(rc.canMove(dir)) {
+            rc.move(dir);
+        }
+    }
 }
