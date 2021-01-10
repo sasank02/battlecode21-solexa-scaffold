@@ -12,18 +12,18 @@ public class BotMuckraker extends Bot {
 	 */
     public static void loop(RobotController theRC) throws GameActionException {
         Bot.init(theRC);
-
         // Get directions from EC
 		for (RobotInfo robot : rc.senseNearbyRobots(2, us)) {
 			if (robot.type == RobotType.ENLIGHTENMENT_CENTER) {
 				dir = directions[rc.getFlag(robot.ID)];
-				System.out.println("Set DIR TO :" + dir + " from " + rc.getFlag(robot.ID));
+				//System.out.println("Set DIR TO :" + dir + " from " + rc.getFlag(robot.ID));
 				break;
 			}
 		}
-
         while (true) {
+        	//System.out.println(rc.getRoundNum());
             try {
+            	//System.out.println("TAKING TURN");
                 turn();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -33,9 +33,10 @@ public class BotMuckraker extends Bot {
     }
 
     public static void turn() throws GameActionException {
-
-    	System.out.println("Hi");
+    	// Update bot location
 		here = rc.getLocation();
+
+		//System.out.println("Searching for slanderers to destroy");
         int actionRadius = rc.getType().actionRadiusSquared;
         int sensorRadius = rc.getType().sensorRadiusSquared;
         // Destroy slanderer if in range.
@@ -43,56 +44,64 @@ public class BotMuckraker extends Bot {
             if (robot.type.canBeExposed()) {
                 if (rc.canExpose(robot.location)) {
                     rc.expose(robot.location);
-                   	return;
+                    return;
                 }
             }
         }
+		//System.out.println("No slanderers in range to destroy");
 
 		NavPolicy navPolicy = new PolicyAvoidFriendlyMuckrakers(rc.senseNearbyRobots(sensorRadius, us));
 
+
         // Find closest slanderer around to chase
+		targetDistance = 1000;
+		target = null;
 		for (RobotInfo robot : rc.senseNearbyRobots(sensorRadius, them)) {
-			//TODO: What is target distance????
-			targetDistance = 1000;
-			target = null;
 			if (robot.type.canBeExposed()) {
 				int distanceFrom = here.distanceSquaredTo(robot.location);
 				if (distanceFrom < targetDistance) {
 					target = robot.location;
+					targetDistance = distanceFrom;
 				}
 			}
 		}
+		//System.out.println("Finished finding slanderer");
 
 		// Chase slanderer if any found.
 		if (target != null) {
+			//System.out.println("Chasing slanderer");
 			Nav.goTo(target, navPolicy);
 			return;
 		}
+		//System.out.println("No chasing");
 
 		// If you hit a border, choose a new random direction to scout
-		if (!rc.canSenseLocation(here.add(dir))) {
+		if (!rc.onTheMap(here.add(dir))) {
+			System.out.println("HIT BORDER");
 			int times = (int)(Math.random() * 6) + 1;
+			//System.out.println("ROTATING " + times + " times");
 			for (int i = 0; i < times; ++i) 
-				dir.rotateLeft();
+				dir = dir.rotateLeft();
+			//System.out.println("NEW DIRECTION: " + dir);
 		}
-
 
 		// TODO: Some way to report back to EC if you find an enemy / neutral EC
 		for (RobotInfo robot : rc.senseNearbyRobots(sensorRadius, them)) {
-			//if enlightenment center encountered
-			if(robot.type.canBid()){
-				int distanceFrom = here.distanceSquaredTo(robot.location);
-				//FIXME: distance from
-				if (distanceFrom < 25) {
-					sendLocation(2);
-				}
+			if (robot.type == RobotType.ENLIGHTENMENT_CENTER) {
+				//ENLIGHTENMENT CENTER FOUND
+				MapLocation ecLocation = robot.getLocation();
+				sendLocation(ecLocation,2);
+				System.out.print("EC LOCATION SENT");
+
+				//FIXME: CHANGE TO WHAT
+				rc.setFlag(rc.getID());
 			}
 		}
 
+
 		// Move in direction if no slanderers near
 		// TODO: Fix, they don't move at the very start for unknown reasons and also don't adjust direction. (bug)
+		//System.out.println(dir + " " + rc.canMove(dir));
 		Nav.moveDirection(dir, navPolicy);
     }
-
-    //public static void registerECTranslation(MapLocation loc){}
 }

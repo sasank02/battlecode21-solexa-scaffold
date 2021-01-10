@@ -59,6 +59,17 @@ public class Bot {
             }
         }
     }
+
+    static void sendLocation(MapLocation loc, int extraInformation) throws GameActionException{
+        MapLocation location = loc;
+        int x = location.x, y = location.y;
+
+        int encodedLocation = (x % 128) * 128 + (y%128) + extraInformation * 128 * 128;
+        if(rc.canSetFlag(rc.getID())) {
+            rc.setFlag(encodedLocation);
+            System.out.print("FLAG SET: " + encodedLocation);
+        }
+    }
     //key 2: ec
 
     /* ENCODED INFO AS SUCH
@@ -96,4 +107,7 @@ public class Bot {
     static int getExtraInfFromFlag(int flag) {
         return flag / 128 / 128;
     }
+
+
+
 }

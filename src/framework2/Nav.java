@@ -18,12 +18,12 @@ class PolicyAvoidFriendlyMuckrakers extends Bot implements NavPolicy {
 
 	public boolean isSafeToMoveTo(Direction dir) {
 		// Keep muckrakers spread out
-		/*for (RobotInfo ally : nearbyAllies) {
+		for (RobotInfo ally : nearbyAllies) {
 			if (ally.type == RobotType.MUCKRAKER) {
-			    System.out.println("DIRECTION TO ALLY: " + here.directionTo(ally.location));
+			    //System.out.println("DIRECTION TO ALLY: " + here.directionTo(ally.location));
 				// if (here.directionTo(ally.location) == dir) return false;
 			}
-		}*/
+		}
 
 		return true;
 	}
@@ -60,6 +60,22 @@ public class Nav extends Bot {
 	private static MapLocation dest;
     private static NavPolicy policy;
 
+	private enum BugState {
+		DIRECT, BUG
+	}
+
+	public enum WallSide {
+		LEFT, RIGHT
+	}
+
+	private static BugState bugState;
+	public static WallSide bugWallSide = WallSide.LEFT;
+	private static int bugStartDistSq;
+	private static Direction bugLastMoveDir;
+	private static Direction bugLookStartDir;
+	private static int bugRotationCount;
+	private static int bugMovesSinceSeenObstacle = 0;
+
 	private static boolean move(Direction dir) throws GameActionException {
         rc.move(dir);
         return true;
@@ -71,22 +87,48 @@ public class Nav extends Bot {
      * @return - True if you can move in that direction and it's safe.
      */
     private static boolean canMove(Direction dir) {
+        //System.out.println(dir + " " + rc.canMove(dir) + policy.isSafeToMoveTo(dir));
         return rc.canMove(dir) && policy.isSafeToMoveTo(dir);
     }
 
-    /**
-     * TODO: Implement this with BugNAV 2
-     * @param theDest - MapLocation where you want to go
-     * @param thePolicy - Policy to follow for safe movement
-     * @throws GameActionException - Catch errors
-     */
+	/**
+	 * Try to directly take the straight line to the destination.
+	 * @return - True if you can take the direct line
+	 * @throws GameActionException
+	 */
+	private static boolean tryMoveDirect() throws GameActionException {
+		Direction toDest = here.directionTo(dest);
+
+		if (canMove(toDest)) {
+			move(toDest);
+			return true;
+		}
+
+		Direction[] dirs = new Direction[2];
+		dirs[0] = toDest.rotateLeft();
+		dirs[1] = toDest.rotateRight();
+		for (Direction dir : dirs) {
+			if (canMove(dir)) {
+				move(dir);
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Move directly to the destination.
+	 * @param theDest - Destination square you want to reach
+	 * @param thePolicy - Policy to decide whether you can head in a direction
+	 * @throws GameActionException
+	 */
 	public static void goTo(MapLocation theDest, NavPolicy thePolicy) throws GameActionException {
-		if (here.equals(dest)) return;
-		
 		dest = theDest;
 		policy = thePolicy;
 
-		// bugMove();
+		if (here.equals(dest)) return;
+
+		tryMoveDirect();
 	}
 
     /**
@@ -96,23 +138,8 @@ public class Nav extends Bot {
      * @throws GameActionException
      */
 	public static void moveDirection(Direction theDir, NavPolicy thePolicy) throws GameActionException {
-		dest = null;
-		policy = thePolicy;
+		dest = here.add(theDir);
 
-        if (canMove(theDir)) {
-            move(theDir);
-            return;
-        }
-
-        Direction[] dirs = new Direction[2];
-        dirs[0] = theDir.rotateLeft();
-        dirs[1] = theDir.rotateRight();
-
-        for (Direction dir : dirs) {
-            if (canMove(dir)) {
-                move(dir);
-                return;
-            }
-        }
+		goTo(dest, thePolicy);
 	}
 }
