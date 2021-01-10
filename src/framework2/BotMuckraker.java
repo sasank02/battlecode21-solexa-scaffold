@@ -33,6 +33,8 @@ public class BotMuckraker extends Bot {
     }
 
     public static void turn() throws GameActionException {
+
+    	System.out.println("Hi");
 		here = rc.getLocation();
         int actionRadius = rc.getType().actionRadiusSquared;
         int sensorRadius = rc.getType().sensorRadiusSquared;
@@ -41,7 +43,7 @@ public class BotMuckraker extends Bot {
             if (robot.type.canBeExposed()) {
                 if (rc.canExpose(robot.location)) {
                     rc.expose(robot.location);
-                    return;
+                   	return;
                 }
             }
         }
@@ -50,6 +52,7 @@ public class BotMuckraker extends Bot {
 
         // Find closest slanderer around to chase
 		for (RobotInfo robot : rc.senseNearbyRobots(sensorRadius, them)) {
+			//TODO: What is target distance????
 			targetDistance = 1000;
 			target = null;
 			if (robot.type.canBeExposed()) {
@@ -73,9 +76,23 @@ public class BotMuckraker extends Bot {
 				dir.rotateLeft();
 		}
 
+
 		// TODO: Some way to report back to EC if you find an enemy / neutral EC
+		for (RobotInfo robot : rc.senseNearbyRobots(sensorRadius, them)) {
+			//if enlightenment center encountered
+			if(robot.type.canBid()){
+				int distanceFrom = here.distanceSquaredTo(robot.location);
+				//FIXME: distance from
+				if (distanceFrom < 25) {
+					sendLocation(2);
+				}
+			}
+		}
+
 		// Move in direction if no slanderers near
 		// TODO: Fix, they don't move at the very start for unknown reasons and also don't adjust direction. (bug)
 		Nav.moveDirection(dir, navPolicy);
     }
+
+    //public static void registerECTranslation(MapLocation loc){}
 }

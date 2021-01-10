@@ -45,8 +45,19 @@ public class BotEC extends Bot {
                     break;
                 }
             }
-
 		}
+
+        if(themECLocs.size() > 0){
+            for (Direction dir : directions) {
+                //what value do we want for politican influence
+                if (rc.canBuildRobot(RobotType.POLITICIAN, dir, 1)) {
+                    rc.buildRobot(RobotType.POLITICIAN, dir, 1);
+                    break;
+                }
+            }
+        }
+
+
 
         // TODO: General strat after that
     }

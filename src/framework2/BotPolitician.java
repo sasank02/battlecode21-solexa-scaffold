@@ -21,7 +21,7 @@ public class BotPolitician extends Bot {
      * @throws GameActionException
      */
     public static void turn() throws GameActionException {
-		here = rc.getLocation();
+        here = rc.getLocation();
         int actionRadius = rc.getType().actionRadiusSquared;
         RobotInfo[] attackable = rc.senseNearbyRobots(actionRadius, them);
         int total = rc.senseNearbyRobots(actionRadius).length;
@@ -31,9 +31,30 @@ public class BotPolitician extends Bot {
             rc.empower(actionRadius);
             return;
         }
+        
+        if(themECLocs.size() > 0){
+            MapLocation  destinationEC = findClosestEnemyEC();
+            Nav.goTo(destinationEC,null);
+            System.out.println("MOVING");
+        }
+
         Direction dir = Direction.values()[(int)(8*Math.random())];
         if(rc.canMove(dir)) {
             rc.move(dir);
         }
+    }
+
+    private static MapLocation findClosestEnemyEC(){
+        MapLocation shortest = null;
+        int shortDist = Integer.MAX_VALUE;
+        for(Integer loc : themECLocs){
+             MapLocation location = getLocationFromFlag(loc);
+             int dist = location.distanceSquaredTo(location);
+             if(dist < shortDist){
+                 shortDist = dist;
+                 shortest = location;
+             }
+        }
+        return shortest;
     }
 }

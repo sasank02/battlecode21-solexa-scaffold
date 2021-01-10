@@ -2,6 +2,10 @@ package framework2;
 
 import battlecode.common.*;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Generic Bot class with universal items for all robot types.
  */
@@ -10,7 +14,7 @@ public class Bot {
     protected static Team us;
     protected static Team them;
 	public static int flag;
-
+    public static ArrayList<Integer> themECLocs;
     public static MapLocation here;
 
     static final Direction[] directions = {
@@ -27,7 +31,7 @@ public class Bot {
 
     protected static void init(RobotController theRC) throws GameActionException {
         rc = theRC;
-
+        themECLocs = new ArrayList<Integer>();
         us = rc.getTeam();
         them = us.opponent();
 
@@ -48,8 +52,14 @@ public class Bot {
         MapLocation location = rc.getLocation();
         int x = location.x, y = location.y;
         int encodedLocation = (x % 128) * 128 + (y%128) + extraInformation * 128 * 128;
-        if(rc.canSetFlag(encodedLocation)) rc.setFlag(encodedLocation);
+        if(rc.canSetFlag(encodedLocation)) {
+            rc.setFlag(encodedLocation);
+            if(extraInformation == 2){
+                themECLocs.add(encodedLocation);
+            }
+        }
     }
+    //key 2: ec
 
     /* ENCODED INFO AS SUCH
          2^23     2^14      2^7       2^0
@@ -81,5 +91,9 @@ public class Bot {
         if(rc.getLocation().distanceSquaredTo(alternative) < rc.getLocation().distanceSquaredTo(actualLocation)) actualLocation = alternative;
 
         return actualLocation;
+    }
+
+    static int getExtraInfFromFlag(int flag) {
+        return flag / 128 / 128;
     }
 }
