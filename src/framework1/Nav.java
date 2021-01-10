@@ -25,4 +25,8 @@ public class Nav {
     public static void bugNav(MapLocation dest) {
 
     }
+    
+    public static void RandomMovement(NavSafetyPolicy policy) {
+		
+	}
 }

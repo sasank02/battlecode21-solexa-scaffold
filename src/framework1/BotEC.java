@@ -3,8 +3,9 @@ package framework1;
 import battlecode.common.*;
 
 public class BotEC extends Bot {
-
-
+	public static int tslS = 0;
+	public static int tslM = 0;
+	
     public static void loop(RobotController theRC) throws GameActionException {
         Bot.init(theRC);
         while (true) {
@@ -24,8 +25,8 @@ public class BotEC extends Bot {
 
         int influence = rc.getInfluence();
 
-        if (rc.getRoundNum() >= 750) makeSlanderers = true;
-        if (influence >= 50) makePoliticians = true;
+        if (rc.getRoundNum() >= 250) makeSlanderers = true;
+        if (influence >= 20) makePoliticians = true;
         makeMuckrakers = true;
 
         int slanderers = 0;
@@ -41,35 +42,46 @@ public class BotEC extends Bot {
         // TODO: Determine healthy num, 10 to even use politician
 
         // TODO: Determine when to make each type or robot
-
-        boolean slandLast = false;
-        if (makeSlanderers && slanderers == 0 && !slandLast) {
-            for (Direction dir : directions) {
-                if (rc.canBuildRobot(RobotType.SLANDERER, dir, Math.min(influence, 949))) {
-                    rc.buildRobot(RobotType.SLANDERER, dir, Math.min(influence, 949));
-                    slandLast = true;
-                } else {
+		
+		if (rc.getRoundNum() >= 2000) {
+			for (Direction dir : directions) {
+				int infMin = 20, infMax = (int)(0.75d * influence);
+				int infToUse = (int)(Math.random() * (infMax - infMin)) + infMin;
+                if (rc.canBuildRobot(RobotType.POLITICIAN, dir, infToUse)) {
+                    rc.buildRobot(RobotType.POLITICIAN, dir, infToUse);
                     break;
                 }
             }
-        } else if (makeMuckrakers && influence >= 1 && muckrakers == 0) {
+		} else if (makeSlanderers && tslS >= 14) {
+            for (Direction dir : directions) {
+                if (rc.canBuildRobot(RobotType.SLANDERER, dir, Math.min(949, influence))) {
+                    rc.buildRobot(RobotType.SLANDERER, dir, Math.min(949, influence));
+					tslS = 0;
+					break;
+                }
+            }
+            tslM++;
+            // TODO: Make influence req for muckrackers increase with turn rounds
+        } else if (makeMuckrakers && tslM >= 4 && influence < 200) {
             for (Direction dir : directions) {
                 if (rc.canBuildRobot(RobotType.MUCKRAKER, dir, 1)) {
                     rc.buildRobot(RobotType.MUCKRAKER, dir, 1);
-                } else {
+                    tslM = 0;
                     break;
                 }
             }
-            slandLast = false;
+            ++tslS;
         } else if (makePoliticians) {
             for (Direction dir : directions) {
-                if (rc.canBuildRobot(RobotType.POLITICIAN, dir, Math.max(50, (int)(0.6 * influence)))) {
-                    rc.buildRobot(RobotType.POLITICIAN, dir, Math.max(50, (int)(0.6 * influence)));
-                } else {
+				int infMin = 20, infMax = (int)(0.75d * influence);
+				int infToUse = (int)(Math.random() * (infMax - infMin)) + infMin;
+                if (rc.canBuildRobot(RobotType.POLITICIAN, dir, infToUse)) {
+                    rc.buildRobot(RobotType.POLITICIAN, dir, infToUse);
                     break;
                 }
             }
-            slandLast = false;
+            ++tslS;
+            ++tslM;
         }
     }
 }

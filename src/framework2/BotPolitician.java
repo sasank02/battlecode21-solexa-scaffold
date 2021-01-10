@@ -1,4 +1,4 @@
-package framework1;
+package framework2;
 
 import battlecode.common.*;
 
@@ -15,7 +15,13 @@ public class BotPolitician extends Bot {
         }
     }
 
+    /**
+     * General politician, just attacks if any enemies in range, random movement not yet integrated into Nav.
+     * Very stupid.
+     * @throws GameActionException
+     */
     public static void turn() throws GameActionException {
+		here = rc.getLocation();
         int actionRadius = rc.getType().actionRadiusSquared;
         RobotInfo[] attackable = rc.senseNearbyRobots(actionRadius, them);
         int total = rc.senseNearbyRobots(actionRadius).length;
