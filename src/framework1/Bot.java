@@ -18,6 +18,7 @@ public class Bot {
             Direction.SOUTHWEST,
             Direction.WEST,
             Direction.NORTHWEST,
+            //test
     };
 
     protected static void init(RobotController theRC) throws GameActionException {
