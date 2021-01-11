@@ -10,6 +10,10 @@ public class BotEC extends Bot {
     static ArrayList<Integer> childArr = new ArrayList<Integer>();
     static int trigger = 0;
     static int count;
+    static int nextSpace = 0;
+    static MapLocation[] ECs = new MapLocation[12];
+
+
     public static void loop(RobotController theRC) throws GameActionException {
         Bot.init(theRC);
         flag = -1;
@@ -49,17 +53,6 @@ public class BotEC extends Bot {
                 if (!alreadyFound) {
                     ECs[nextSpace] = ECLocation;
                     ++nextSpace;
-        //System.out.println(".");
-
-        for(Integer id : childArr){
-            if(rc.canGetFlag(id))
-            {   int idx = rc.getFlag(id);
-                //System.out.println("idx: "+  idx);
-                // TODO: Modularize this code, create a Map one with static functions to read and write messages.
-                if (Comm.getExtraInformationFromFlag(flag) == 2) {
-                    MapLocation ecLoc = Comm.getLocationFromFlag(idx);
-                    Comm.sendLocation(1);
-                    //System.out.println("Enlightenment Center At: " + ecLoc.x + ", " + ecLoc.y + "YAYAYAYAYAYAYAYAYAYAYAYA");
                 }
             }
         }
