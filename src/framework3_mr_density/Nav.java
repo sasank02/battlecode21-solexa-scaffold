@@ -1,4 +1,4 @@
-package framework2;
+package framework3_mr_density;
 
 import battlecode.common.*;
 

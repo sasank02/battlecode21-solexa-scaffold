@@ -1,4 +1,4 @@
-package framework2;
+package framework3_mr_density;
 
 import battlecode.common.*;
 
@@ -70,72 +70,58 @@ public class BotMuckraker extends Bot {
 			return;
 		}
 
-		// If you hit a border, choose a new random direction to scout
-		if (!rc.onTheMap(here.add(dir))) {
-			int times = (int)(Math.random() * 6) + 1;
-			for (int i = 0; i < times; ++i) 
-				dir = dir.rotateLeft();
-			Nav.moveDirection(dir, navPolicy);
-			return;
-		}
-		
 		// "bubble" of influence
-		boolean blocked[] = new boolean[8];
-		boolean bounce = false;
-		boolean clogged = true;
+		int density[] = new int[8];
+		double spreadDensity[] = new double[8];
 		for (RobotInfo ally : nearbyAllies) {
 			Direction dirTo = here.directionTo(ally.location);
-			if (dirTo == dir) bounce = true;
-			blocked[Nav.numRightRotations(Direction.NORTH, dirTo)] = true;
+			++density[Nav.numRightRotations(Direction.NORTH, dir)];
 		}
+
+		for (int i = 0; i < 8; ++i) {
+			for (int j = 0; j < 8; ++j) {
+				int naiveDiff = Math.abs(j - i);
+				int diff = Math.min(naiveDiff, 8 - naiveDiff);
+				switch (diff) {
+					case 0:
+						spreadDensity[j] += (1.0d * density[i]);
+						break;
+					case 1:
+						spreadDensity[j] += (0.8d * density[i]);
+						break;
+					case 2:
+						spreadDensity[j] += (0.6d * density[i]);
+						break;
+					case 3:
+						spreadDensity[j] += (0.4d * density[i]);
+						break;
+					case 4:						
+						spreadDensity[j] += (0.2d * density[i]);
+						break;
+				}
+			}
+		}
+
+		// Never try to walk directly at border
+		for (Direction dir : directions) {
+			if (!rc.onTheMap(here.add(dir))) {
+				spreadDensity[Nav.numRightRotations(Direction.NORTH, dir)] += 100000000;
+			}
+		}
+
+		double minDensity = spreadDensity[Nav.numRightRotations(Direction.NORTH, dir)];
+		Direction chosenDir = dir;
 
 		for (Direction idir : directions) {
-			if (!rc.onTheMap(here.add(idir))) {
-				blocked[Nav.numRightRotations(Direction.NORTH, idir)] = true;
+			double dirDensity = spreadDensity[Nav.numRightRotations(Direction.NORTH, idir)];
+			System.out.println(idir + ": " + dirDensity);
+			if (dirDensity < minDensity) {
+				minDensity = dirDensity;
+				chosenDir = idir;
 			}
 		}
+		dir = chosenDir;
 		
-		// TODO: Congregating in corners, how do we want to not do that.
-		// Check if we're blocked on all sides
-		for (int i = 0; i < 8; ++i) clogged &= blocked[i];
-		// TODO: Just because there aren't bots to one direction doesn't mean that you can't be clogged and need to force out, might be on border
-
-		// Bounce the opposite way then
-		// Make better bounces like slight bounces instead of full on swings
-		Direction newDir = dir;
-
-		if (clogged) {
-			// dir = dir.opposite();
-			newDir = Direction.values()[(int)(8 * Math.random())];
-		} else if (bounce) {
-			Direction leftDir = dir.opposite();
-			Direction rightDir = dir.opposite();
-
-			if (!blocked[Nav.numRightRotations(Direction.NORTH, leftDir)]) {
-				newDir = leftDir;
-				return;
-			} else if (!blocked[Nav.numRightRotations(Direction.NORTH, rightDir)]) {
-				newDir = rightDir;
-				return;
-			}
-			leftDir = leftDir.rotateLeft();
-			rightDir = rightDir.rotateRight();
-		}
-		
-		if (newDir == dir.opposite()) {
-			++bounceBack;
-		}
-
-		// Try not to get too many on the same bounce pathway
-
-		if (bounceBack == 4) {
-			if ((int)(2 * Math.random()) == 1) {
-				newDir = newDir.rotateRight();
-			} else newDir = newDir.rotateLeft();
-			bounceBack = 0;
-		}
-
-		dir = newDir;
 		// TODO: Some way to report back to EC if you find an enemy / neutral EC
 		// Move in direction if no slanderers near
 		// TODO: Fix, they don't move at the very start for unknown reasons and also don't adjust direction. (bug)
