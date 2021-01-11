@@ -28,20 +28,22 @@ public class BotEC extends Bot {
      * Spawning setup
      */
     public static void turn() throws GameActionException {
-        System.out.println(".");
+        //System.out.println(".");
         
         for(Integer id : childArr){
             if(rc.canGetFlag(id))
             {   int idx = rc.getFlag(id);
-                System.out.println("idx: "+  idx);
-                if (idx / 128 / 128 == 2) {
-                    MapLocation ecLoc = getLocationFromFlag(idx);
-                    System.out.println("Enlightenment Center At: " + ecLoc.x + ", " + ecLoc.y + "YAYAYAYAYAYAYAYAYAYAYAYA");
-                    //TODO: what do we do with robots already used
+                //System.out.println("idx: "+  idx);
+                // TODO: Modularize this code, create a Map one with static functions to read and write messages.
+                if (Comm.getExtraInformationFromFlag(flag) == 2) {
+                    MapLocation ecLoc = Comm.getLocationFromFlag(idx);
+                    //System.out.println("Enlightenment Center At: " + ecLoc.x + ", " + ecLoc.y + "YAYAYAYAYAYAYAYAYAYAYAYA");
+                    // TODO: what do we do with robots already used
                 }
             }
         }
-    		// Create slanderer first for eco
+
+    	// Create slanderer first for eco
 		here = rc.getLocation();
         if (rc.getRoundNum() == 1) {
             for (Direction dir : directions) {
@@ -54,7 +56,6 @@ public class BotEC extends Bot {
         }
 
         // Send scouts out each direction to scout
-        // TODO: Broken, they don't move at the beginning for unknown reasons. (bug)
         if (flag == 7) flag = -1;
         if (flag < 7) {
 			if (rc.canBuildRobot(RobotType.MUCKRAKER, directions[flag + 1], 1)) {
@@ -77,9 +78,11 @@ public class BotEC extends Bot {
             return;
 		}
 
+        // Return to just maintaining a ratio between muckrakers / slanderers / polis
 
 
         // TODO: General strat after that
+        // If something off cooldown, then you want to send to that EC.
     }
 
 }
