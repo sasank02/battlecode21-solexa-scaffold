@@ -30,7 +30,7 @@ public class Comm extends Bot {
         int x = location.x, y = location.y;
 
         int encodedLocation = (x % 128) * 128 + (y%128) + extraInformation * 128 * 128;
-        if(rc.canSetFlag(rc.getID())) {
+        if(rc.canSetFlag(encodedLocation)) {
             rc.setFlag(encodedLocation);
             //System.out.print("FLAG SET: " + encodedLocation);
         }

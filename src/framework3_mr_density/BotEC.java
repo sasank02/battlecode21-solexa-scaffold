@@ -27,7 +27,8 @@ public class BotEC extends Bot {
      * Spawning setup
      */
     public static void turn() throws GameActionException {
-
+        //System.out.println(".");
+        
         for(Integer id : childArr){
             if(rc.canGetFlag(id))
             {   int idx = rc.getFlag(id);
@@ -53,17 +54,12 @@ public class BotEC extends Bot {
             return;
         }
 
-        if(rc.getRoundNum() < 50){
-            //spawn 1 of each (slanderer, muckracker, politician)
-
-            //
-        }
-
         // Send scouts out each direction to scout
+        if (flag == 7) flag = -1;
         if (flag < 7) {
 			if (rc.canBuildRobot(RobotType.MUCKRAKER, directions[flag + 1], 1)) {
 				rc.buildRobot(RobotType.MUCKRAKER, directions[flag + 1], 1);
-                //childArr.add(rc.senseRobotAtLocation(rc.adjacentLocation(directions[flag + 1])).getID());
+                childArr.add(rc.senseRobotAtLocation(rc.adjacentLocation(directions[flag + 1])).getID());
                 ++flag;
 				rc.setFlag(flag);
 				return;
@@ -80,28 +76,6 @@ public class BotEC extends Bot {
             }
             return;
 		}
-
-
-        if(flag >= 7 && flag < 42){
-            if(flag%4 == 0){
-                //Build Politician
-                if(rc.canBuildRobot(RobotType.POLITICIAN, directions[flag%7+1], 25)){
-                    rc.buildRobot(RobotType.POLITICIAN, directions[flag%7+1], 25);
-                    ++flag;
-                    rc.setFlag(flag);
-                    return;
-                }
-            }
-            else{
-                //Build Slanderer
-                if(rc.canBuildRobot(RobotType.SLANDERER, directions[flag%7+1], 21)){
-                    rc.buildRobot(RobotType.SLANDERER, directions[flag%7+1], 21);
-                    ++flag;
-                    rc.setFlag(flag);
-                    return;
-                }
-            }
-        }
 
         // Return to just maintaining a ratio between muckrakers / slanderers / polis
 
