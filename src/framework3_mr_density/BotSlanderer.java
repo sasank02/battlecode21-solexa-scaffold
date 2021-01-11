@@ -1,9 +1,6 @@
 package framework3_mr_density;
 
-import battlecode.common.Clock;
-import battlecode.common.Direction;
-import battlecode.common.GameActionException;
-import battlecode.common.RobotController;
+import battlecode.common.*;
 
 public class BotSlanderer extends Bot {
 	// Set home EC and stay within that radius

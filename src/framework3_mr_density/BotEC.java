@@ -23,7 +23,6 @@ public class BotEC extends Bot {
         }
     }
 
-
     /**
      * Spawning setup
      */

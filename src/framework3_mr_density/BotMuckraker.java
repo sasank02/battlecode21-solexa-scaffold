@@ -75,7 +75,8 @@ public class BotMuckraker extends Bot {
 		double spreadDensity[] = new double[8];
 		for (RobotInfo ally : nearbyAllies) {
 			Direction dirTo = here.directionTo(ally.location);
-			++density[Nav.numRightRotations(Direction.NORTH, dirTo)];
+			int distTo = here.distanceSquaredTo(ally.location);
+			density[Nav.numRightRotations(Direction.NORTH, dirTo)] += (41 - distTo);
 		}
 
 		for (int i = 0; i < 8; ++i) {
