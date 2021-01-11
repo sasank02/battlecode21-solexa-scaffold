@@ -32,5 +32,6 @@ public class Bot {
 
         // Note that each bot has to continually update here each turn.
         here = rc.getLocation();
+        flag = 0;
     }
 }

@@ -3,7 +3,7 @@ package framework3_mr_density;
 import battlecode.common.*;
 
 public class BotMuckraker extends Bot {
-	public static Direction dir;
+	public static Direction dir = Direction.values()[(int)(8*Math.random())];
 	public static MapLocation target;
 	public static int targetDistance = 1000;
 	public static int bounceBack = 0;
@@ -13,14 +13,6 @@ public class BotMuckraker extends Bot {
 	 */
     public static void loop(RobotController theRC) throws GameActionException {
         Bot.init(theRC);
-
-        // Get directions from EC
-		for (RobotInfo robot : rc.senseNearbyRobots(2, us)) {
-			if (robot.type == RobotType.ENLIGHTENMENT_CENTER) {
-				dir = directions[rc.getFlag(robot.ID)];
-				break;
-			}
-		}
 
         while (true) {
             try {
@@ -83,7 +75,7 @@ public class BotMuckraker extends Bot {
 		// Never try to walk directly at border
 		for (Direction idir : directions) {
 			if (!rc.onTheMap(here.add(idir))) {
-				spreadDensity[Nav.numRightRotations(Direction.NORTH, idir)] += 100000000;
+				density[Nav.numRightRotations(Direction.NORTH, idir)] += 1000000;
 			}
 		}
 
@@ -136,6 +128,17 @@ public class BotMuckraker extends Bot {
 				Comm.sendLocation(loc, 2);
 				foundEC = true;
 				break;
+			}
+		}
+
+		if (!foundEC) {
+			for(RobotInfo robot : rc.senseNearbyRobots(sensorRadius, Team.NEUTRAL)){
+				if(robot.type == RobotType.ENLIGHTENMENT_CENTER){
+					MapLocation loc = robot.getLocation();
+					Comm.sendLocation(loc, 2);
+					foundEC = true;
+					break;
+				}
 			}
 		}
 

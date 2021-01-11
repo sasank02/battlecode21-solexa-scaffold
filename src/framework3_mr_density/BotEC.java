@@ -27,7 +27,6 @@ public class BotEC extends Bot {
     public static void turn() throws GameActionException {
     	// Update information
         here = rc.getLocation();
-        flag = 0;
 
         int sensorRadius = rc.getType().sensorRadiusSquared;
 
@@ -50,10 +49,6 @@ public class BotEC extends Bot {
                 }
                 // TODO: If new EC, add and spawn, else check if you want to send big boy
             }
-        }
-
-        for (int i = 0; i < nextSpace; ++i) {
-            System.out.println(ECs[i]);
         }
         
         if (rc.getRoundNum() == 1) {
