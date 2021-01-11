@@ -9,10 +9,11 @@ public class BotEC extends Bot {
 
     static ArrayList<Integer> childArr = new ArrayList<Integer>();
     static int trigger = 0;
-
+    static int count;
     public static void loop(RobotController theRC) throws GameActionException {
         Bot.init(theRC);
         flag = -1;
+        count = -1;
         while (true) {
             try {
                 turn();
@@ -36,6 +37,7 @@ public class BotEC extends Bot {
                 // TODO: Modularize this code, create a Map one with static functions to read and write messages.
                 if (Comm.getExtraInformationFromFlag(flag) == 2) {
                     MapLocation ecLoc = Comm.getLocationFromFlag(idx);
+                    Comm.sendLocation(1);
                     //System.out.println("Enlightenment Center At: " + ecLoc.x + ", " + ecLoc.y + "YAYAYAYAYAYAYAYAYAYAYAYA");
                 }
             }
@@ -54,11 +56,12 @@ public class BotEC extends Bot {
         }
 
         // Send scouts out each direction to scout
-        //if (flag == 7) flag = -1;
-        if (flag < 7) {
-			if (rc.canBuildRobot(RobotType.MUCKRAKER, directions[flag + 1], 1)) {
+        //if (count == 7) count = -1;
+        if (count < 7) {
+			if (rc.canBuildRobot(RobotType.MUCKRAKER, directions[count + 1], 1)) {
 				rc.buildRobot(RobotType.MUCKRAKER, directions[flag + 1], 1);
                 childArr.add(rc.senseRobotAtLocation(rc.adjacentLocation(directions[flag + 1])).getID());
+                ++count;
                 ++flag;
 				rc.setFlag(flag);
 				return;
@@ -67,6 +70,7 @@ public class BotEC extends Bot {
             for (Direction dir : directions) {
                 if (rc.canBuildRobot(RobotType.MUCKRAKER, dir, 1)) {
                     rc.buildRobot(RobotType.MUCKRAKER, dir, 1);
+                    ++count;
                     ++flag;
                     rc.setFlag(flag);
                     break;
@@ -75,16 +79,16 @@ public class BotEC extends Bot {
             return;
 		}
 
-        if(flag >= 7 && flag < 42){
+        if(count >= 7 && count < 42){
             System.out.println("");
-            if(flag%4 ==0){
+            if(count%4 ==0){
                 //poli
                 System.out.println("Politician");
                 for (Direction dir : directions) {
-                    if (rc.canBuildRobot(RobotType.POLITICIAN, dir, 25)) {
-                        rc.buildRobot(RobotType.POLITICIAN, dir, 25);
-                        ++flag;
-                        rc.setFlag(flag);
+                    if (rc.canBuildRobot(RobotType.POLITICIAN, dir, 40)) {
+                        rc.buildRobot(RobotType.POLITICIAN, dir, 40);
+                        ++count;
+                        rc.setFlag(0);
                         break;
                     }
                 }
@@ -97,7 +101,7 @@ public class BotEC extends Bot {
                 for (Direction dir : directions) {
                     if (rc.canBuildRobot(RobotType.SLANDERER, dir, 21)) {
                         rc.buildRobot(RobotType.SLANDERER, dir, 21);
-                        ++flag;
+                        ++count;
                         rc.setFlag(flag);
                         break;
                     }
@@ -106,24 +110,24 @@ public class BotEC extends Bot {
         }
 
         // Return to just maintaining a ratio between muckrakers / slanderers / polis
-        if (flag >= 42){
-            if(flag%7 == 0 || flag%7-1 == 0) {
+        if (count >= 42){
+            if(count%7 == 0 || count%7-1 == 0) {
                 System.out.println("Slanderer");
                 for (Direction dir : directions) {
                     if (rc.canBuildRobot(RobotType.SLANDERER, dir, rc.getInfluence())) {
                         rc.buildRobot(RobotType.SLANDERER, dir, rc.getInfluence());
-                        ++flag;
+                        ++count;
                         rc.setFlag(flag);
                         break;
                     }
                 }
             }
-            else if(flag%7-2 == 0){
+            else if(count%7-2 == 0){
                 System.out.println("Muckracker");
                 for (Direction dir : directions) {
                     if (rc.canBuildRobot(RobotType.MUCKRAKER, dir, 1)) {
                         rc.buildRobot(RobotType.MUCKRAKER, dir, 1);
-                        ++flag;
+                        ++count;
                         rc.setFlag(flag);
                         break;
                     }
@@ -135,8 +139,8 @@ public class BotEC extends Bot {
                 for (Direction dir : directions) {
                     if (rc.canBuildRobot(RobotType.POLITICIAN, dir, 25)) {
                         rc.buildRobot(RobotType.POLITICIAN, dir, 25);
-                        ++flag;
-                        rc.setFlag(flag);
+                        ++count;
+                        rc.setFlag(0);
                         break;
                     }
                 }
