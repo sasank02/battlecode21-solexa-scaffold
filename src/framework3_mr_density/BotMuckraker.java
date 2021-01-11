@@ -13,6 +13,7 @@ public class BotMuckraker extends Bot {
 	 */
     public static void loop(RobotController theRC) throws GameActionException {
         Bot.init(theRC);
+
         // Get directions from EC
 //		for (RobotInfo robot : rc.senseNearbyRobots(2, us)) {
 //			if (robot.type == RobotType.ENLIGHTENMENT_CENTER) {
@@ -20,6 +21,7 @@ public class BotMuckraker extends Bot {
 //				break;
 //			}
 //		}
+
         while (true) {
             try {
                 turn();
@@ -78,7 +80,6 @@ public class BotMuckraker extends Bot {
 			density[Nav.numRightRotations(Direction.NORTH, dirTo)] += (41 - distTo);
 		}
 
-
 		// Never try to walk directly at border
 		for (Direction idir : directions) {
 			if (!rc.onTheMap(here.add(idir))) {
@@ -122,7 +123,10 @@ public class BotMuckraker extends Bot {
 			}
 		}
 		dir = chosenDir;
+		
 		RobotInfo[] nearbyEnemies = rc.senseNearbyRobots(sensorRadius, them);
+
+
 
 		boolean foundEC = false;
 		// TODO: Some way to report back to EC if you find an enemy / neutral EC

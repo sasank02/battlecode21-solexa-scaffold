@@ -28,8 +28,29 @@ public class BotEC extends Bot {
      * Spawning setup
      */
     public static void turn() throws GameActionException {
+    	// Update information
+        here = rc.getLocation();
+
+        int sensorRadius = rc.getType().sensorRadiusSquared;
+
+        // Check for new rally locations
+        for (RobotInfo ally : rc.senseNearbyRobots(sensorRadius, us)) {
+            int allyFlag = rc.getFlag(ally.ID);
+            if (Comm.getExtraInformationFromFlag(allyFlag) == 2) {
+                MapLocation ECLocation = Comm.getLocationFromFlag(allyFlag);
+                boolean alreadyFound = false;
+                for (int i = 0; i < nextSpace; ++i) {
+                    if (ECs[i].equals(ECLocation)) {
+                        alreadyFound = true;
+                        break;
+                    }
+                }
+
+                if (!alreadyFound) {
+                    ECs[nextSpace] = ECLocation;
+                    ++nextSpace;
         //System.out.println(".");
-        
+
         for(Integer id : childArr){
             if(rc.canGetFlag(id))
             {   int idx = rc.getFlag(id);
