@@ -114,7 +114,7 @@ public class BotMuckraker extends Bot {
 
 		for (Direction idir : directions) {
 			double dirDensity = spreadDensity[Nav.numRightRotations(Direction.NORTH, idir)];
-			System.out.println(idir + ": " + dirDensity);
+			//System.out.println(idir + ": " + dirDensity);
 			if (dirDensity < minDensity) {
 				minDensity = dirDensity;
 				chosenDir = idir;
@@ -123,8 +123,15 @@ public class BotMuckraker extends Bot {
 		dir = chosenDir;
 		
 		// TODO: Some way to report back to EC if you find an enemy / neutral EC
-		// Move in direction if no slanderers near
-		// TODO: Fix, they don't move at the very start for unknown reasons and also don't adjust direction. (bug)
+		for(RobotInfo robot : rc.senseNearbyRobots(sensorRadius, them)){
+			if(robot.type == RobotType.ENLIGHTENMENT_CENTER){
+				MapLocation loc = robot.getLocation();
+				sendLocation(loc, 2);
+				System.out.println("EC AT: " + loc.x + ", " + loc.y);
+
+
+			}
+		}		// TODO: Fix, they don't move at the very start for unknown reasons and also don't adjust direction. (bug)
 		Nav.moveDirection(dir, navPolicy);
     }
 }

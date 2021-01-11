@@ -51,6 +51,18 @@ public class Bot {
         if(rc.canSetFlag(encodedLocation)) rc.setFlag(encodedLocation);
     }
 
+
+    static void sendLocation(MapLocation loc, int extraInformation) throws GameActionException{
+        MapLocation location = loc;
+        int x = location.x, y = location.y;
+
+        int encodedLocation = (x % 128) * 128 + (y%128) + extraInformation * 128 * 128;
+        if(rc.canSetFlag(rc.getID())) {
+            rc.setFlag(encodedLocation);
+            System.out.print("FLAG SET: " + encodedLocation);
+        }
+    }
+
     /* ENCODED INFO AS SUCH
          2^23     2^14      2^7       2^0
          [         |         |        ]

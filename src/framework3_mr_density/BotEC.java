@@ -2,7 +2,13 @@ package framework3_mr_density;
 
 import battlecode.common.*;
 
+import java.util.ArrayList;
+
 public class BotEC extends Bot {
+
+    static ArrayList<Integer> childArr = new ArrayList<Integer>();
+
+
     public static void loop(RobotController theRC) throws GameActionException {
         Bot.init(theRC);
         flag = -1;
@@ -39,7 +45,8 @@ public class BotEC extends Bot {
         if (flag < 7) {
 			if (rc.canBuildRobot(RobotType.MUCKRAKER, directions[flag + 1], 1)) {
 				rc.buildRobot(RobotType.MUCKRAKER, directions[flag + 1], 1);
-				++flag;
+                childArr.add(rc.senseRobotAtLocation(rc.adjacentLocation(directions[flag + 1])).getID());
+                ++flag;
 				rc.setFlag(flag);
 				return;
 			}
@@ -47,6 +54,7 @@ public class BotEC extends Bot {
             for (Direction dir : directions) {
                 if (rc.canBuildRobot(RobotType.MUCKRAKER, dir, 1)) {
                     rc.buildRobot(RobotType.MUCKRAKER, dir, 1);
+                    childArr.add(rc.senseRobotAtLocation(rc.adjacentLocation(dir)).getID());
                     ++flag;
                     rc.setFlag(flag);
                     break;
@@ -54,6 +62,20 @@ public class BotEC extends Bot {
             }
             return;
 		}
+
+
+        for(Integer id : childArr){
+            if(rc.canGetFlag(id))
+            {
+                int idx = rc.getFlag(id);
+                if (idx / 128 / 128 == 2) {
+                    MapLocation ecLoc = getLocationFromFlag(idx);
+                    System.out.println("Enlightenment Center At: " + ecLoc.x + ", " + ecLoc.y);
+                    //TODO: what do we do with robots already used
+                }
+            }
+        }
+
 
         // TODO: General strat after that
     }
