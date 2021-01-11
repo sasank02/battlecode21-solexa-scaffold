@@ -2,11 +2,13 @@ package framework3_mr_density;
 
 import battlecode.common.*;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 public class BotEC extends Bot {
+
+    static ArrayList<Integer> childArr = new ArrayList<Integer>();
     static int trigger = 0;
-    static MapLocation[] ECs = new MapLocation[12];
-    static int[] lastSent = new int[12];
-    static int nextSpace = 0;
 
     public static void loop(RobotController theRC) throws GameActionException {
         Bot.init(theRC);
@@ -47,10 +49,11 @@ public class BotEC extends Bot {
                     ECs[nextSpace] = ECLocation;
                     ++nextSpace;
                 }
-                // TODO: If new EC, add and spawn, else check if you want to send big boy
             }
         }
-        
+
+    	// Create slanderer first for eco
+		here = rc.getLocation();
         if (rc.getRoundNum() == 1) {
             for (Direction dir : directions) {
                 if (rc.canBuildRobot(RobotType.SLANDERER, dir, rc.getInfluence())) {
@@ -62,10 +65,11 @@ public class BotEC extends Bot {
         }
 
         // Send scouts out each direction to scout
-        if (flag == 7) flag = -1;
+        //if (flag == 7) flag = -1;
         if (flag < 7) {
 			if (rc.canBuildRobot(RobotType.MUCKRAKER, directions[flag + 1], 1)) {
 				rc.buildRobot(RobotType.MUCKRAKER, directions[flag + 1], 1);
+                childArr.add(rc.senseRobotAtLocation(rc.adjacentLocation(directions[flag + 1])).getID());
                 ++flag;
 				rc.setFlag(flag);
 				return;
@@ -82,9 +86,73 @@ public class BotEC extends Bot {
             return;
 		}
 
-        // TODO: Set flag after to rally location too.
-        // Return to just maintaining a ratio between muckrakers / slanderers / polis
+        if(flag >= 7 && flag < 42){
+            System.out.println("");
+            if(flag%4 ==0){
+                //poli
+                System.out.println("Politician");
+                for (Direction dir : directions) {
+                    if (rc.canBuildRobot(RobotType.POLITICIAN, dir, 25)) {
+                        rc.buildRobot(RobotType.POLITICIAN, dir, 25);
+                        ++flag;
+                        rc.setFlag(flag);
+                        break;
+                    }
+                }
 
+            }
+            else{
+                //c
+                System.out.println("Sladnerer");
+
+                for (Direction dir : directions) {
+                    if (rc.canBuildRobot(RobotType.SLANDERER, dir, 21)) {
+                        rc.buildRobot(RobotType.SLANDERER, dir, 21);
+                        ++flag;
+                        rc.setFlag(flag);
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Return to just maintaining a ratio between muckrakers / slanderers / polis
+        if (flag >= 42){
+            if(flag%7 == 0 || flag%7-1 == 0) {
+                System.out.println("Slanderer");
+                for (Direction dir : directions) {
+                    if (rc.canBuildRobot(RobotType.SLANDERER, dir, rc.getInfluence())) {
+                        rc.buildRobot(RobotType.SLANDERER, dir, rc.getInfluence());
+                        ++flag;
+                        rc.setFlag(flag);
+                        break;
+                    }
+                }
+            }
+            else if(flag%7-2 == 0){
+                System.out.println("Muckracker");
+                for (Direction dir : directions) {
+                    if (rc.canBuildRobot(RobotType.MUCKRAKER, dir, 1)) {
+                        rc.buildRobot(RobotType.MUCKRAKER, dir, 1);
+                        ++flag;
+                        rc.setFlag(flag);
+                        break;
+                    }
+                }
+            }
+            else{
+                //politician
+                System.out.println("Politician");
+                for (Direction dir : directions) {
+                    if (rc.canBuildRobot(RobotType.POLITICIAN, dir, 25)) {
+                        rc.buildRobot(RobotType.POLITICIAN, dir, 25);
+                        ++flag;
+                        rc.setFlag(flag);
+                        break;
+                    }
+                }
+            }
+        }
 
         // TODO: General strat after that
         // If something off cooldown, then you want to send to that EC.
