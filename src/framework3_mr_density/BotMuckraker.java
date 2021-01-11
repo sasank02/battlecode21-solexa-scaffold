@@ -114,7 +114,7 @@ public class BotMuckraker extends Bot {
 
 		for (Direction idir : directions) {
 			double dirDensity = spreadDensity[Nav.numRightRotations(Direction.NORTH, idir)];
-			// System.out.println(idir + ": " + dirDensity);
+			System.out.println(idir + ": " + dirDensity);
 			if (dirDensity < minDensity) {
 				minDensity = dirDensity;
 				chosenDir = idir;

@@ -67,8 +67,6 @@ public class BotEC extends Bot {
                     MapLocation ecLoc = getLocationFromFlag(idx);
                     System.out.println("Enlightenment Center At: " + ecLoc.x + ", " + ecLoc.y);
                     //TODO: what do we do with robots already used
-
-
                 }
             }
         }

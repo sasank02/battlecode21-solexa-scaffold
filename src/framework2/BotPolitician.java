@@ -27,7 +27,7 @@ public class BotPolitician extends Bot {
         int total = rc.senseNearbyRobots(actionRadius).length;
         int friendlies = rc.senseNearbyRobots(actionRadius, us).length;
         if (attackable.length != 0 && rc.canEmpower(actionRadius)) {
-			//System.out.println(total + " " + friendlies + " " + attackable.length);
+			System.out.println(total + " " + friendlies + " " + attackable.length);
             rc.empower(actionRadius);
             return;
         }
