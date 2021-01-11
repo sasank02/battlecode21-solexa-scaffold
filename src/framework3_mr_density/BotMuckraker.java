@@ -35,6 +35,7 @@ public class BotMuckraker extends Bot {
     public static void turn() throws GameActionException {
     	// Update bot location
 		here = rc.getLocation();
+		flag = 0;
 
         int actionRadius = rc.getType().actionRadiusSquared;
         int sensorRadius = rc.getType().sensorRadiusSquared;
@@ -79,6 +80,13 @@ public class BotMuckraker extends Bot {
 			density[Nav.numRightRotations(Direction.NORTH, dirTo)] += (41 - distTo);
 		}
 
+		// Never try to walk directly at border
+		for (Direction idir : directions) {
+			if (!rc.onTheMap(here.add(idir))) {
+				spreadDensity[Nav.numRightRotations(Direction.NORTH, idir)] += 100000000;
+			}
+		}
+
 		for (int i = 0; i < 8; ++i) {
 			for (int j = 0; j < 8; ++j) {
 				int naiveDiff = Math.abs(j - i);
@@ -103,13 +111,6 @@ public class BotMuckraker extends Bot {
 			}
 		}
 
-		// Never try to walk directly at border
-		for (Direction idir : directions) {
-			if (!rc.onTheMap(here.add(idir))) {
-				spreadDensity[Nav.numRightRotations(Direction.NORTH, idir)] += 100000000;
-			}
-		}
-
 		double minDensity = spreadDensity[Nav.numRightRotations(Direction.NORTH, dir)];
 		Direction chosenDir = dir;
 
@@ -123,15 +124,32 @@ public class BotMuckraker extends Bot {
 		}
 		dir = chosenDir;
 		
+		RobotInfo[] nearbyEnemies = rc.senseNearbyRobots(sensorRadius, them);
+
+
+
+		boolean foundEC = false;
 		// TODO: Some way to report back to EC if you find an enemy / neutral EC
-		for(RobotInfo robot : rc.senseNearbyRobots(sensorRadius, them)){
+		for(RobotInfo robot : nearbyEnemies){
 			if(robot.type == RobotType.ENLIGHTENMENT_CENTER){
 				MapLocation loc = robot.getLocation();
 				Comm.sendLocation(loc, 2);
-				//System.out.println("EC AT: " + loc.x + ", " + loc.y);
+				foundEC = true;
 				break;
 			}
 		}
+
+		if (!foundEC) {
+			for(RobotInfo robot : nearbyAllies){
+				int allyFlag = rc.getFlag(robot.ID);
+				if (robot.getTeam() == us && Comm.getExtraInformationFromFlag(allyFlag) == 2) {
+					flag = allyFlag;
+					break;
+				}
+			}
+			rc.setFlag(flag);
+		}
+
 		Nav.moveDirection(dir, navPolicy);
     }
 }

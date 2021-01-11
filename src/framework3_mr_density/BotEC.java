@@ -2,13 +2,11 @@ package framework3_mr_density;
 
 import battlecode.common.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
 public class BotEC extends Bot {
-
-    static ArrayList<Integer> childArr = new ArrayList<Integer>();
     static int trigger = 0;
+    static MapLocation[] ECs = new MapLocation[12];
+    static int[] lastSent = new int[12];
+    static int nextSpace = 0;
 
     public static void loop(RobotController theRC) throws GameActionException {
         Bot.init(theRC);
@@ -27,23 +25,37 @@ public class BotEC extends Bot {
      * Spawning setup
      */
     public static void turn() throws GameActionException {
-        //System.out.println(".");
-        
-        for(Integer id : childArr){
-            if(rc.canGetFlag(id))
-            {   int idx = rc.getFlag(id);
-                //System.out.println("idx: "+  idx);
-                // TODO: Modularize this code, create a Map one with static functions to read and write messages.
-                if (Comm.getExtraInformationFromFlag(flag) == 2) {
-                    MapLocation ecLoc = Comm.getLocationFromFlag(idx);
-                    //System.out.println("Enlightenment Center At: " + ecLoc.x + ", " + ecLoc.y + "YAYAYAYAYAYAYAYAYAYAYAYA");
-                    // TODO: what do we do with robots already used
+    	// Update information
+        here = rc.getLocation();
+        flag = 0;
+
+        int sensorRadius = rc.getType().sensorRadiusSquared;
+
+        // Check for new rally locations
+        for (RobotInfo ally : rc.senseNearbyRobots(sensorRadius, us)) {
+            int allyFlag = rc.getFlag(ally.ID);
+            if (Comm.getExtraInformationFromFlag(allyFlag) == 2) {
+                MapLocation ECLocation = Comm.getLocationFromFlag(allyFlag);
+                boolean alreadyFound = false;
+                for (int i = 0; i < nextSpace; ++i) {
+                    if (ECs[i].equals(ECLocation)) {
+                        alreadyFound = true;
+                        break;
+                    }
                 }
+
+                if (!alreadyFound) {
+                    ECs[nextSpace] = ECLocation;
+                    ++nextSpace;
+                }
+                // TODO: If new EC, add and spawn, else check if you want to send big boy
             }
         }
 
-    	// Create slanderer first for eco
-		here = rc.getLocation();
+        for (int i = 0; i < nextSpace; ++i) {
+            System.out.println(ECs[i]);
+        }
+        
         if (rc.getRoundNum() == 1) {
             for (Direction dir : directions) {
                 if (rc.canBuildRobot(RobotType.SLANDERER, dir, rc.getInfluence())) {
@@ -59,7 +71,6 @@ public class BotEC extends Bot {
         if (flag < 7) {
 			if (rc.canBuildRobot(RobotType.MUCKRAKER, directions[flag + 1], 1)) {
 				rc.buildRobot(RobotType.MUCKRAKER, directions[flag + 1], 1);
-                childArr.add(rc.senseRobotAtLocation(rc.adjacentLocation(directions[flag + 1])).getID());
                 ++flag;
 				rc.setFlag(flag);
 				return;
@@ -68,7 +79,6 @@ public class BotEC extends Bot {
             for (Direction dir : directions) {
                 if (rc.canBuildRobot(RobotType.MUCKRAKER, dir, 1)) {
                     rc.buildRobot(RobotType.MUCKRAKER, dir, 1);
-                    childArr.add(rc.senseRobotAtLocation(rc.adjacentLocation(dir)).getID());
                     ++flag;
                     rc.setFlag(flag);
                     break;
@@ -77,6 +87,7 @@ public class BotEC extends Bot {
             return;
 		}
 
+        // TODO: Set flag after to rally location too.
         // Return to just maintaining a ratio between muckrakers / slanderers / polis
 
 
