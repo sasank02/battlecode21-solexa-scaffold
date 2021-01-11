@@ -129,7 +129,11 @@ public class BotMuckraker extends Bot {
 				sendLocation(loc, 2);
 				//System.out.println("EC AT: " + loc.x + ", " + loc.y);
 			}
-		}		// TODO: Fix, they don't move at the very start for unknown reasons and also don't adjust direction. (bug)
+		}
+
+
+
+		// TODO: Fix, they don't move at the very start for unknown reasons and also don't adjust direction. (bug)
 		Nav.moveDirection(dir, navPolicy);
     }
 }

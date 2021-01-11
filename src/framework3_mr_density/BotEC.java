@@ -2,13 +2,18 @@ package framework3_mr_density;
 
 import battlecode.common.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 
 public class BotEC extends Bot {
 
     static ArrayList<Integer> childArr = new ArrayList<Integer>();
-    static int trigger = 0;
+    static Map<MapLocation, Integer> uniqueEnemyEC = new HashMap<MapLocation, Integer>();
+    static Integer[] childArray = new Integer[10000];
+    static int numChildren = 0;
+
+    static MapLocation[] uniqueEnemyECLoc = new MapLocation[3];
+    static Integer[] enemyECCooldowns = new Integer[3];
+    static int numEC = 0;
 
     public static void loop(RobotController theRC) throws GameActionException {
         Bot.init(theRC);
@@ -28,20 +33,59 @@ public class BotEC extends Bot {
      * Spawning setup
      */
     public static void turn() throws GameActionException {
-        System.out.println(".");
-        
-        for(Integer id : childArr){
+
+        //MARK: -HEAVY BYTECODE
+        /*for(Integer id : childArr){
             if(rc.canGetFlag(id))
             {   int idx = rc.getFlag(id);
-                System.out.println("idx: "+  idx);
                 if (idx / 128 / 128 == 2) {
                     MapLocation ecLoc = getLocationFromFlag(idx);
-                    System.out.println("Enlightenment Center At: " + ecLoc.x + ", " + ecLoc.y + "YAYAYAYAYAYAYAYAYAYAYAYA");
-                    //TODO: what do we do with robots already used
+                    System.out.println("Enlightenment Center At: " + ecLoc.x + ", " + ecLoc.y);
+                    if(!uniqueEnemyEC.containsKey(ecLoc)) uniqueEnemyEC.put(ecLoc, 0);
+
+                }
+            }
+        }*/
+
+        //MARK: -LOW BYTECODE
+        for(int i = 0; i < numChildren; i++){
+            int id = childArray[i];
+            if(rc.canGetFlag(id))
+            {   int idx = rc.getFlag(id);
+                if (idx / 128 / 128 == 2) {
+                    MapLocation ecLoc = getLocationFromFlag(idx);
+                    System.out.println("Enlightenment Center At: " + ecLoc.x + ", " + ecLoc.y);
+                    if(!uniqueEnemyEC.containsKey(ecLoc)) uniqueEnemyEC.put(ecLoc, 0);
+                    if((indexOf(uniqueEnemyECLoc, ecLoc) == -1)){
+                        uniqueEnemyECLoc[numEC] = ecLoc;
+                        enemyECCooldowns[numEC] = 0;
+                        numEC++;
+                    }
                 }
             }
         }
-    		// Create slanderer first for eco
+
+        //HEAVY BYTECODE
+        /*for(Map.Entry<MapLocation, Integer> entry : uniqueEnemyEC.entrySet()){
+            if(entry.getValue() % 20 == 0){
+                if (rc.canBuildRobot(RobotType.POLITICIAN, Direction.NORTH, 20)){
+                    rc.buildRobot(RobotType.POLITICIAN, Direction.NORTH, 20);
+                    //TODO: ADD POLITICAN IN SETS NOT INDIVIDUALS
+                    System.out.println("politician added");
+                }
+            } uniqueEnemyEC.put(entry.getKey(), entry.getValue() + 1);
+        }*/
+
+        for(int i = 0; i < 3; i++){
+            if(enemyECCooldowns[i] % 20 == 0){
+                if(rc.canBuildRobot(RobotType.POLITICIAN, Direction.NORTH, 20)){
+                    rc.buildRobot(RobotType.POLITICIAN, Direction.NORTH, 20);
+                    System.out.println("poliAdded");
+                }
+            }
+        }
+
+        // Create slanderer first for eco
 		here = rc.getLocation();
         if (rc.getRoundNum() == 1) {
             for (Direction dir : directions) {
@@ -80,6 +124,14 @@ public class BotEC extends Bot {
 
 
         // TODO: General strat after that
+    }
+
+    static int indexOf(MapLocation[] someArray, MapLocation myElement){
+        int index = -1;
+        for(int i = 0; i < someArray.length; i++){
+            if(someArray[i] == myElement) index = i;
+        }
+        return index;
     }
 
 }
