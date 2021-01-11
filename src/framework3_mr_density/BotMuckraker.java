@@ -3,7 +3,7 @@ package framework3_mr_density;
 import battlecode.common.*;
 
 public class BotMuckraker extends Bot {
-	public static Direction dir;
+	public static Direction dir = Direction.NORTH;
 	public static MapLocation target;
 	public static int targetDistance = 1000;
 	public static int bounceBack = 0;
@@ -15,12 +15,12 @@ public class BotMuckraker extends Bot {
         Bot.init(theRC);
 
         // Get directions from EC
-		for (RobotInfo robot : rc.senseNearbyRobots(2, us)) {
-			if (robot.type == RobotType.ENLIGHTENMENT_CENTER) {
-				dir = directions[rc.getFlag(robot.ID)];
-				break;
-			}
-		}
+//		for (RobotInfo robot : rc.senseNearbyRobots(2, us)) {
+//			if (robot.type == RobotType.ENLIGHTENMENT_CENTER) {
+//				dir = directions[rc.getFlag(robot.ID)];
+//				break;
+//			}
+//		}
 
         while (true) {
             try {

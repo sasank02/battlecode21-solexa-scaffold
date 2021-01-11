@@ -3,7 +3,7 @@ package framework3_mr_density;
 import battlecode.common.*;
 
 public class BotPolitician extends Bot {
-    public static Direction dir;
+    public static Direction dir = Direction.NORTH;
     
     public static void loop(RobotController theRC) throws GameActionException {
         Bot.init(theRC);

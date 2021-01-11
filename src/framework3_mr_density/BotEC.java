@@ -37,7 +37,6 @@ public class BotEC extends Bot {
                 if (Comm.getExtraInformationFromFlag(flag) == 2) {
                     MapLocation ecLoc = Comm.getLocationFromFlag(idx);
                     //System.out.println("Enlightenment Center At: " + ecLoc.x + ", " + ecLoc.y + "YAYAYAYAYAYAYAYAYAYAYAYA");
-                    // TODO: what do we do with robots already used
                 }
             }
         }
@@ -55,7 +54,7 @@ public class BotEC extends Bot {
         }
 
         // Send scouts out each direction to scout
-        if (flag == 7) flag = -1;
+        //if (flag == 7) flag = -1;
         if (flag < 7) {
 			if (rc.canBuildRobot(RobotType.MUCKRAKER, directions[flag + 1], 1)) {
 				rc.buildRobot(RobotType.MUCKRAKER, directions[flag + 1], 1);
@@ -68,7 +67,6 @@ public class BotEC extends Bot {
             for (Direction dir : directions) {
                 if (rc.canBuildRobot(RobotType.MUCKRAKER, dir, 1)) {
                     rc.buildRobot(RobotType.MUCKRAKER, dir, 1);
-                    childArr.add(rc.senseRobotAtLocation(rc.adjacentLocation(dir)).getID());
                     ++flag;
                     rc.setFlag(flag);
                     break;
@@ -77,8 +75,73 @@ public class BotEC extends Bot {
             return;
 		}
 
-        // Return to just maintaining a ratio between muckrakers / slanderers / polis
+        if(flag >= 7 && flag < 42){
+            System.out.println("");
+            if(flag%4 ==0){
+                //poli
+                System.out.println("Politician");
+                for (Direction dir : directions) {
+                    if (rc.canBuildRobot(RobotType.POLITICIAN, dir, 25)) {
+                        rc.buildRobot(RobotType.POLITICIAN, dir, 25);
+                        ++flag;
+                        rc.setFlag(flag);
+                        break;
+                    }
+                }
 
+            }
+            else{
+                //c
+                System.out.println("Sladnerer");
+
+                for (Direction dir : directions) {
+                    if (rc.canBuildRobot(RobotType.SLANDERER, dir, 21)) {
+                        rc.buildRobot(RobotType.SLANDERER, dir, 21);
+                        ++flag;
+                        rc.setFlag(flag);
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Return to just maintaining a ratio between muckrakers / slanderers / polis
+        if (flag >= 42){
+            if(flag%7 == 0 || flag%7-1 == 0) {
+                System.out.println("Slanderer");
+                for (Direction dir : directions) {
+                    if (rc.canBuildRobot(RobotType.SLANDERER, dir, rc.getInfluence())) {
+                        rc.buildRobot(RobotType.SLANDERER, dir, rc.getInfluence());
+                        ++flag;
+                        rc.setFlag(flag);
+                        break;
+                    }
+                }
+            }
+            else if(flag%7-2 == 0){
+                System.out.println("Muckracker");
+                for (Direction dir : directions) {
+                    if (rc.canBuildRobot(RobotType.MUCKRAKER, dir, 1)) {
+                        rc.buildRobot(RobotType.MUCKRAKER, dir, 1);
+                        ++flag;
+                        rc.setFlag(flag);
+                        break;
+                    }
+                }
+            }
+            else{
+                //politician
+                System.out.println("Politician");
+                for (Direction dir : directions) {
+                    if (rc.canBuildRobot(RobotType.POLITICIAN, dir, 25)) {
+                        rc.buildRobot(RobotType.POLITICIAN, dir, 25);
+                        ++flag;
+                        rc.setFlag(flag);
+                        break;
+                    }
+                }
+            }
+        }
 
         // TODO: General strat after that
         // If something off cooldown, then you want to send to that EC.
