@@ -75,7 +75,7 @@ public class BotMuckraker extends Bot {
 		double spreadDensity[] = new double[8];
 		for (RobotInfo ally : nearbyAllies) {
 			Direction dirTo = here.directionTo(ally.location);
-			++density[Nav.numRightRotations(Direction.NORTH, dir)];
+			++density[Nav.numRightRotations(Direction.NORTH, dirTo)];
 		}
 
 		for (int i = 0; i < 8; ++i) {
@@ -103,9 +103,9 @@ public class BotMuckraker extends Bot {
 		}
 
 		// Never try to walk directly at border
-		for (Direction dir : directions) {
-			if (!rc.onTheMap(here.add(dir))) {
-				spreadDensity[Nav.numRightRotations(Direction.NORTH, dir)] += 100000000;
+		for (Direction idir : directions) {
+			if (!rc.onTheMap(here.add(idir))) {
+				spreadDensity[Nav.numRightRotations(Direction.NORTH, idir)] += 100000000;
 			}
 		}
 
@@ -114,7 +114,7 @@ public class BotMuckraker extends Bot {
 
 		for (Direction idir : directions) {
 			double dirDensity = spreadDensity[Nav.numRightRotations(Direction.NORTH, idir)];
-			System.out.println(idir + ": " + dirDensity);
+			// System.out.println(idir + ": " + dirDensity);
 			if (dirDensity < minDensity) {
 				minDensity = dirDensity;
 				chosenDir = idir;
