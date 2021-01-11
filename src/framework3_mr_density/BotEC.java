@@ -3,11 +3,12 @@ package framework3_mr_density;
 import battlecode.common.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class BotEC extends Bot {
 
     static ArrayList<Integer> childArr = new ArrayList<Integer>();
-
+    static int trigger = 0;
 
     public static void loop(RobotController theRC) throws GameActionException {
         Bot.init(theRC);
@@ -27,7 +28,20 @@ public class BotEC extends Bot {
      * Spawning setup
      */
     public static void turn() throws GameActionException {
-		// Create slanderer first for eco
+        System.out.println(".");
+        
+        for(Integer id : childArr){
+            if(rc.canGetFlag(id))
+            {   int idx = rc.getFlag(id);
+                System.out.println("idx: "+  idx);
+                if (idx / 128 / 128 == 2) {
+                    MapLocation ecLoc = getLocationFromFlag(idx);
+                    System.out.println("Enlightenment Center At: " + ecLoc.x + ", " + ecLoc.y + "YAYAYAYAYAYAYAYAYAYAYAYA");
+                    //TODO: what do we do with robots already used
+                }
+            }
+        }
+    		// Create slanderer first for eco
 		here = rc.getLocation();
         if (rc.getRoundNum() == 1) {
             for (Direction dir : directions) {
@@ -64,19 +78,8 @@ public class BotEC extends Bot {
 		}
 
 
-        for(Integer id : childArr){
-            if(rc.canGetFlag(id))
-            {
-                int idx = rc.getFlag(id);
-                if (idx / 128 / 128 == 2) {
-                    MapLocation ecLoc = getLocationFromFlag(idx);
-                    System.out.println("Enlightenment Center At: " + ecLoc.x + ", " + ecLoc.y);
-                    //TODO: what do we do with robots already used
-                }
-            }
-        }
-
 
         // TODO: General strat after that
     }
+
 }

@@ -59,7 +59,7 @@ public class Bot {
         int encodedLocation = (x % 128) * 128 + (y%128) + extraInformation * 128 * 128;
         if(rc.canSetFlag(rc.getID())) {
             rc.setFlag(encodedLocation);
-            System.out.print("FLAG SET: " + encodedLocation);
+            //System.out.print("FLAG SET: " + encodedLocation);
         }
     }
 
